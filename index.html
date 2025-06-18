@@ -1,24 +1,180 @@
+
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>bullet-burst-craft</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ContentCraft - Professional Content Generator</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body class="light-theme">
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-section">
+                    <i data-lucide="sparkles" class="logo-icon"></i>
+                    <h1 class="logo-text">ContentCraft</h1>
+                </div>
+                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                    <i data-lucide="sun" class="theme-icon sun-icon"></i>
+                    <i data-lucide="moon" class="theme-icon moon-icon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
 
-    <meta property="og:title" content="bullet-burst-craft" />
-    <meta property="og:description" content="Lovable Generated Project" />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Hero Section -->
+            <div class="hero-section animate-fade-in">
+                <h1 class="hero-title">
+                    Generate Professional Content
+                    <span class="hero-highlight">In Seconds, Not Hours</span>
+                </h1>
+                <p class="hero-description">
+                    Transform your bullet points into polished emails and reports with AI-powered generation. 
+                    Choose your tone, add your points, and get professional content instantly.
+                </p>
+            </div>
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@lovable_dev" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
-  </head>
+            <!-- Generator Section -->
+            <div class="generator-section animate-fade-in" style="animation-delay: 0.2s">
+                <div class="generator-grid">
+                    <!-- Input Section -->
+                    <div class="input-section">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">
+                                    <i data-lucide="edit-3"></i>
+                                    Content Generator
+                                </h2>
+                                <p class="card-description">
+                                    Fill in the details below to generate your professional content
+                                </p>
+                            </div>
+                            <div class="card-content">
+                                <form id="content-form" class="form">
+                                    <!-- Content Type Selection -->
+                                    <div class="form-group">
+                                        <label class="form-label">Content Type</label>
+                                        <div class="radio-group">
+                                            <div class="radio-item">
+                                                <input type="radio" id="email" name="contentType" value="email" checked>
+                                                <label for="email" class="radio-label">
+                                                    <i data-lucide="mail"></i>
+                                                    Email
+                                                </label>
+                                            </div>
+                                            <div class="radio-item">
+                                                <input type="radio" id="report" name="contentType" value="report">
+                                                <label for="report" class="radio-label">
+                                                    <i data-lucide="file-text"></i>
+                                                    Report
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
 
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+                                    <!-- Tone Selection -->
+                                    <div class="form-group">
+                                        <label for="tone" class="form-label">Tone</label>
+                                        <select id="tone" class="select-input">
+                                            <option value="formal">Formal</option>
+                                            <option value="casual">Casual</option>
+                                            <option value="friendly">Friendly</option>
+                                            <option value="professional">Professional</option>
+                                            <option value="persuasive">Persuasive</option>
+                                            <option value="confident">Confident</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Subject/Title -->
+                                    <div class="form-group">
+                                        <label for="subject" class="form-label" id="subject-label">Subject</label>
+                                        <input type="text" id="subject" class="text-input" placeholder="Enter the subject of your content">
+                                    </div>
+
+                                    <!-- Recipient (Email only) -->
+                                    <div class="form-group" id="recipient-group">
+                                        <label for="recipient" class="form-label">Recipient</label>
+                                        <input type="text" id="recipient" class="text-input" placeholder="To whom are you sending this email?">
+                                    </div>
+
+                                    <!-- Bullet Points -->
+                                    <div class="form-group">
+                                        <label for="bulletPoints" class="form-label">Key Points</label>
+                                        <textarea id="bulletPoints" class="textarea-input" placeholder="• Enter your key points here&#10;• Each point on a new line&#10;• Use bullet points or numbers&#10;• Be specific and clear" rows="6"></textarea>
+                                    </div>
+
+                                    <!-- Master Prompting -->
+                                    <div class="form-group">
+                                        <button type="button" id="master-prompt-toggle" class="collapsible-toggle">
+                                            <i data-lucide="chevron-right" class="toggle-icon"></i>
+                                            Advanced Instructions (Optional)
+                                        </button>
+                                        <div id="master-prompt-content" class="collapsible-content">
+                                            <textarea id="masterPrompt" class="textarea-input" placeholder="Add any specific instructions, context, or requirements for the AI to consider when generating your content..." rows="4"></textarea>
+                                        </div>
+                                    </div>
+
+                                    <!-- Generate Button -->
+                                    <button type="submit" id="generate-btn" class="generate-btn">
+                                        <i data-lucide="sparkles"></i>
+                                        Generate Content
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Preview Section -->
+                    <div class="preview-section">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">
+                                    <i data-lucide="eye"></i>
+                                    Preview
+                                </h2>
+                                <div class="action-buttons" id="action-buttons">
+                                    <button id="copy-btn" class="action-btn copy-btn">
+                                        <i data-lucide="copy"></i>
+                                        Copy
+                                    </button>
+                                    <button id="download-btn" class="action-btn download-btn" style="display: none;">
+                                        <i data-lucide="download"></i>
+                                        Download PDF
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-content">
+                                <div id="preview-content" class="preview-content">
+                                    <div class="preview-placeholder">
+                                        <i data-lucide="file-text" class="placeholder-icon"></i>
+                                        <p>Your generated content will appear here...</p>
+                                        <p class="placeholder-subtitle">Fill in the form and click "Generate Content" to see your professional email or report.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <div class="toast-content">
+            <i data-lucide="check-circle" class="toast-icon"></i>
+            <span class="toast-message">Content copied to clipboard!</span>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
 </html>
