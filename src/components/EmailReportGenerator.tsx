@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Copy, Download, Mail, FileText, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,123 +9,61 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-
+import jsPDF from 'jspdf';
 type ContentType = 'email' | 'report';
 type Tone = 'formal' | 'casual' | 'professional' | 'friendly' | 'urgent';
 
 export const EmailReportGenerator = () => {
   const [contentType, setContentType] = useState<ContentType>('email');
   const [tone, setTone] = useState<Tone>('professional');
-  const [subject, setSubject] = useState('');
   const [recipient, setRecipient] = useState('');
   const [bulletPoints, setBulletPoints] = useState('');
   const [generatedContent, setGeneratedContent] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
 
-  const generateContent = () => {
-    if (!bulletPoints.trim()) {
-      toast({
-        title: "Missing Information",
-        description: "Please add some bullet points to generate content.",
-        variant: "destructive",
-      });
-      return;
-    }
+  const generateContent = async () => {
+  if (!bulletPoints.trim()) {
+    toast({
+      title: "Missing Information",
+      description: "Please add some bullet points to generate content.",
+      variant: "destructive",
+    });
+    return;
+  }
 
-    setIsGenerating(true);
-    
-    // Simulate API call with realistic delay
-    setTimeout(() => {
-      const points = bulletPoints.split('\n').filter(point => point.trim());
-      
-      if (contentType === 'email') {
-        const emailContent = generateEmail(points, tone, subject, recipient);
-        setGeneratedContent(emailContent);
-      } else {
-        const reportContent = generateReport(points, tone, subject);
-        setGeneratedContent(reportContent);
-      }
-      
-      setIsGenerating(false);
-      
-      toast({
-        title: "Content Generated!",
-        description: `Your ${contentType} has been successfully generated.`,
-      });
-    }, 1500);
-  };
+  setIsGenerating(true);
 
-  const generateEmail = (points: string[], tone: Tone, subject: string, recipient: string) => {
-    const greetings = {
-      formal: 'Dear',
-      casual: 'Hi',
-      professional: 'Dear',
-      friendly: 'Hello',
-      urgent: 'Dear'
-    };
-
-    const closings = {
-      formal: 'Sincerely',
-      casual: 'Best',
-      professional: 'Best regards',
-      friendly: 'Warm regards',
-      urgent: 'Urgently'
-    };
-
-    const introLines = {
-      formal: 'I hope this email finds you well. I am writing to inform you about the following matters:',
-      casual: 'Hope you\'re doing well! I wanted to update you on a few things:',
-      professional: 'I hope this message finds you well. I would like to provide you with an update on the following items:',
-      friendly: 'I hope you\'re having a great day! I wanted to share some updates with you:',
-      urgent: 'I am writing to bring to your immediate attention the following critical matters:'
-    };
-
-    return `Subject: ${subject || 'Important Update'}
-
-${greetings[tone]} ${recipient || '[Recipient Name]'},
-
-${introLines[tone]}
-
-${points.map(point => `• ${point.trim()}`).join('\n')}
-
-Please let me know if you have any questions or need further clarification on any of these points.
-
-${closings[tone]},
-[Your Name]`;
-  };
-
-  const generateReport = (points: string[], tone: Tone, title: string) => {
-    const now = new Date();
-    const dateStr = now.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+  try {
+    const response = await fetch('http://127.0.0.1:5000/generate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contentType,
+        tone,
+        recipient,
+        bulletPoints: bulletPoints.split('\n').filter(point => point.trim()),
+      }),
     });
 
-    const introLines = {
-      formal: 'This report presents a comprehensive overview of the following key points and findings:',
-      casual: 'Here\'s a quick rundown of the main points covered:',
-      professional: 'This document outlines the key findings and important information regarding:',
-      friendly: 'This friendly report covers the following important topics:',
-      urgent: 'This urgent report highlights critical issues that require immediate attention:'
-    };
+    const data = await response.json();
 
-    return `${title || 'Executive Report'}
-Generated on: ${dateStr}
+if (response.ok) {
+  setGeneratedContent(data.content);
+  toast({
+    title: "Content Generated!",
+    description: `Your ${contentType} has been successfully generated.`,
+  });
+} else {
+  throw new Error(data.error || "Unknown error");
+}
+  } finally {
+    setIsGenerating(false);
+  }
+};
 
-EXECUTIVE SUMMARY
-${introLines[tone]}
-
-KEY POINTS:
-${points.map((point, index) => `${index + 1}. ${point.trim()}`).join('\n')}
-
-CONCLUSION:
-The points outlined above represent the current status and key findings. Further action may be required based on the nature of these items.
-
----
-Report generated by Email & Report Generator`;
-  };
 
   const copyToClipboard = async () => {
     try {
@@ -144,12 +81,26 @@ Report generated by Email & Report Generator`;
     }
   };
 
-  const downloadAsPDF = () => {
+ const downloadAsPDF = () => {
+  if (!generatedContent.trim()) {
     toast({
-      title: "PDF Generation",
-      description: "PDF download feature would be implemented with backend integration.",
+      title: "Nothing to download",
+      description: "Generate a report first before downloading.",
+      variant: "destructive",
     });
-  };
+    return;
+  }
+
+  const doc = new jsPDF();
+  const lines = doc.splitTextToSize(generatedContent, 180); // wraps content nicely
+  doc.text(lines, 10, 10);
+  doc.save('generated-report.pdf');
+
+  toast({
+    title: "Download Started",
+    description: "Your report PDF is being downloaded.",
+  });
+};
 
   return (
     <div className="grid lg:grid-cols-2 gap-6 h-full">
@@ -169,7 +120,7 @@ Report generated by Email & Report Generator`;
               <Button
                 variant={contentType === 'email' ? 'default' : 'outline'}
                 onClick={() => setContentType('email')}
-                className="flex-1 transition-all duration-200"
+                className="flex-1"
               >
                 <Mail className="h-4 w-4 mr-2" />
                 Email
@@ -177,7 +128,7 @@ Report generated by Email & Report Generator`;
               <Button
                 variant={contentType === 'report' ? 'default' : 'outline'}
                 onClick={() => setContentType('report')}
-                className="flex-1 transition-all duration-200"
+                className="flex-1"
               >
                 <FileText className="h-4 w-4 mr-2" />
                 Report
@@ -200,16 +151,6 @@ Report generated by Email & Report Generator`;
                 <SelectItem value="urgent">Urgent</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-
-          {/* Subject/Title */}
-          <div className="space-y-2">
-            <Label>{contentType === 'email' ? 'Subject' : 'Report Title'}</Label>
-            <Input
-              placeholder={contentType === 'email' ? 'Email subject...' : 'Report title...'}
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-            />
           </div>
 
           {/* Recipient (Email only) */}
@@ -275,36 +216,31 @@ Report generated by Email & Report Generator`;
           </div>
         </CardHeader>
         <CardContent>
-          {generatedContent ? (
+          {isGenerating ? (
+            <div className="flex flex-col items-center justify-center h-[400px] text-muted-foreground">
+              <div className="animate-spin h-8 w-8 border-b-2 border-primary rounded-full mb-4" />
+              <p className="text-sm">Generating {contentType} with LLM...</p>
+            </div>
+          ) : generatedContent ? (
             <div className="space-y-4">
               <div className="relative">
                 <pre className="whitespace-pre-wrap text-sm bg-muted/50 p-4 rounded-lg border min-h-[400px] max-h-[500px] overflow-y-auto">
                   {generatedContent}
                 </pre>
               </div>
-              
               <Separator />
-              
               <div className="flex gap-2 flex-wrap">
-                <Button
-                  onClick={copyToClipboard}
-                  variant="outline"
-                  className="transition-all duration-200 hover:scale-105"
-                >
+                <Button onClick={copyToClipboard} variant="outline">
                   <Copy className="h-4 w-4 mr-2" />
                   Copy
                 </Button>
-                
                 {contentType === 'report' && (
-                  <Button
-                    onClick={downloadAsPDF}
-                    variant="outline"
-                    className="transition-all duration-200 hover:scale-105"
-                  >
-                    <Download className="h-4 w-4 mr-2" />
-                    Download PDF
-                  </Button>
-                )}
+  <Button onClick={downloadAsPDF} variant="outline">
+    <Download className="h-4 w-4 mr-2" />
+    Download PDF
+  </Button>
+)}
+
               </div>
             </div>
           ) : (
