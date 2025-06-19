@@ -35,7 +35,7 @@ export const EmailReportGenerator = () => {
   setIsGenerating(true);
 
   try {
-    const response = await fetch('http://127.0.0.1:5000/generate', {
+    const response = await fetch('https://automatic-mail-report-backend.onrender.com/generate', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
