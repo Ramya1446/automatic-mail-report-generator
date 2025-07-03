@@ -31,7 +31,14 @@ ai-content/
 ## ✨ How It Works
 
 The frontend sends bullet points + tone + type (email/report) → Flask backend → LLM via Together API → returns generated content.
-![image](https://github.com/user-attachments/assets/6fa69b3b-bf23-477f-b5e3-8686061d6401)
+
+![image](https://github.com/user-attachments/assets/043cd147-e7f2-4a42-bb88-ede6400d3ed4)
+![image](https://github.com/user-attachments/assets/1a983951-9368-41d0-b213-b59352de3c70)
+
+![image](https://github.com/user-attachments/assets/e2510da5-cb01-4b98-9c0b-bb7a8ad981fe)
+
+![image](https://github.com/user-attachments/assets/4c67f028-b3fe-4536-99ab-d3551ac17a9f)
+![image](https://github.com/user-attachments/assets/ef1292c8-2d48-4f7c-af2a-ea933b10f897)
 
 ---
 
